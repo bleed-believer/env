@@ -13,8 +13,10 @@ describe('Env class', () => {
         it('Read variables from the file when it exists', (t: it.TestContext) => {
             const fake = new EnvFake({ [ENV_PATH]: 'APP_HOST=localhost\nAPP_PORT=8080' });
             const env = new Env(ENV_PATH, {
-                host: { rawName: 'APP_HOST', required: true },
-                port: { rawName: 'APP_PORT', required: true }
+                variables: {
+                    host: { rawName: 'APP_HOST', required: true },
+                    port: { rawName: 'APP_PORT', required: true }
+                }
             }, fake);
 
             t.assert.strictEqual(env.get('host'), 'localhost');
@@ -30,7 +32,9 @@ describe('Env class', () => {
             );
 
             const env = new Env(ENV_PATH, {
-                host: { rawName: 'APP_HOST', required: true }
+                variables: {
+                    host: { rawName: 'APP_HOST', required: true }
+                }
             }, fake);
 
             t.assert.strictEqual(env.get('host'), 'from-file');
@@ -43,7 +47,9 @@ describe('Env class', () => {
             );
 
             const env = new Env(ENV_PATH, {
-                host: { rawName: 'APP_HOST' }
+                variables: {
+                    host: { rawName: 'APP_HOST' }
+                }
             }, fake);
 
             t.assert.strictEqual(env.get('host'), '');
@@ -61,9 +67,11 @@ describe('Env class', () => {
             });
 
             const env = new Env(ENV_PATH, {
-                host: { rawName: 'DB_HOST', required: true },
-                user: { rawName: 'DB_USER', required: true },
-                pass: { rawName: 'DB_PASS', required: true }
+                variables: {
+                    host: { rawName: 'DB_HOST', required: true },
+                    user: { rawName: 'DB_USER', required: true },
+                    pass: { rawName: 'DB_PASS', required: true }
+                }
             }, fake);
 
             t.assert.strictEqual(env.get('host'), 'localhost');
@@ -74,7 +82,9 @@ describe('Env class', () => {
         it('Look up the variable by its "rawName", not by its key', (t: it.TestContext) => {
             const fake = new EnvFake({ [ENV_PATH]: 'port=1111\nAPP_PORT=2222' });
             const env = new Env(ENV_PATH, {
-                port: { rawName: 'APP_PORT', required: true }
+                variables: {
+                    port: { rawName: 'APP_PORT', required: true }
+                }
             }, fake);
 
             t.assert.strictEqual(env.get('port'), '2222');
@@ -87,7 +97,9 @@ describe('Env class', () => {
             );
 
             const env = new Env('/another/.env', {
-                host: { rawName: 'APP_HOST', required: true }
+                variables: {
+                    host: { rawName: 'APP_HOST', required: true }
+                }
             }, fake);
 
             t.assert.strictEqual(env.path, '/another/.env');
@@ -104,8 +116,10 @@ describe('Env class', () => {
             });
 
             const env = new Env(ENV_PATH, {
-                host: { rawName: 'APP_HOST', required: true },
-                port: { rawName: 'APP_PORT', required: true }
+                variables: {
+                    host: { rawName: 'APP_HOST', required: true },
+                    port: { rawName: 'APP_PORT', required: true }
+                }
             }, fake);
 
             t.assert.strictEqual(env.get('host'), 'localhost');
@@ -123,8 +137,10 @@ describe('Env class', () => {
             );
 
             const env = new Env(ENV_PATH, {
-                host: { rawName: 'APP_HOST', required: true },
-                port: { rawName: 'APP_PORT', required: true }
+                variables: {
+                    host: { rawName: 'APP_HOST', required: true },
+                    port: { rawName: 'APP_PORT', required: true }
+                }
             }, fake);
 
             t.assert.strictEqual(env.get('host'), 'from-file');
@@ -134,7 +150,9 @@ describe('Env class', () => {
         it('Return undefined for an optional variable missing in both sources', (t: it.TestContext) => {
             const fake = new EnvFake({ [ENV_PATH]: 'APP_HOST=localhost' });
             const env = new Env(ENV_PATH, {
-                port: { rawName: 'APP_PORT' }
+                variables: {
+                    port: { rawName: 'APP_PORT' }
+                }
             }, fake);
 
             t.assert.strictEqual(env.get('port'), undefined);
@@ -147,7 +165,9 @@ describe('Env class', () => {
             );
 
             const env = new Env(ENV_PATH, {
-                secret: { rawName: 'APP_SECRET', required: true }
+                variables: {
+                    secret: { rawName: 'APP_SECRET', required: true }
+                }
             }, fake);
 
             t.assert.throws(() => env.get('secret'), {
@@ -167,7 +187,9 @@ describe('Env class', () => {
             );
 
             const env = new Env(ENV_PATH, {
-                host: { rawName: 'APP_HOST', required: true }
+                variables: {
+                    host: { rawName: 'APP_HOST', required: true }
+                }
             }, fake);
 
             t.assert.throws(() => env.get('host'), error);
@@ -182,7 +204,9 @@ describe('Env class', () => {
             );
 
             const env = new Env(ENV_PATH, {
-                port: { rawName: 'APP_PORT', required: true, callback: v => parseInt(v, 10) }
+                variables: {
+                    port: { rawName: 'APP_PORT', required: true, callback: v => parseInt(v, 10) }
+                }
             }, fake);
 
             t.assert.strictEqual(env.get('port'), 8080);
@@ -191,7 +215,9 @@ describe('Env class', () => {
         it('Transform a value read from process.env', (t: it.TestContext) => {
             const fake = new EnvFake({}, { APP_DEBUG: 'true' });
             const env = new Env(ENV_PATH, {
-                debug: { rawName: 'APP_DEBUG', required: true, callback: v => v === 'true' }
+                variables: {
+                    debug: { rawName: 'APP_DEBUG', required: true, callback: v => v === 'true' }
+                }
             }, fake);
 
             t.assert.strictEqual(env.get('debug'), true);
@@ -200,7 +226,9 @@ describe('Env class', () => {
         it('Pass undefined to the callback of a missing optional variable', (t: it.TestContext) => {
             const fake = new EnvFake();
             const env = new Env(ENV_PATH, {
-                port: { rawName: 'APP_PORT', callback: v => parseInt(v ?? '3000', 10) }
+                variables: {
+                    port: { rawName: 'APP_PORT', callback: v => parseInt(v ?? '3000', 10) }
+                }
             }, fake);
 
             t.assert.strictEqual(env.get('port'), 3000);
@@ -210,18 +238,99 @@ describe('Env class', () => {
             let calls = 0;
             const fake = new EnvFake();
             const env = new Env(ENV_PATH, {
-                port: {
-                    rawName: 'APP_PORT',
-                    required: true,
-                    callback: v => {
-                        calls++;
-                        return parseInt(v, 10);
+                variables: {
+                    port: {
+                        rawName: 'APP_PORT',
+                        required: true,
+                        callback: v => {
+                            calls++;
+                            return parseInt(v, 10);
+                        }
                     }
                 }
             }, fake);
 
             t.assert.throws(() => env.get('port'), /APP_PORT/);
             t.assert.strictEqual(calls, 0);
+        });
+    });
+
+    describe('File cache', () => {
+        it('Read the file on every call when "cacheable" is not set', (t: it.TestContext) => {
+            const fake = new EnvFake({ [ENV_PATH]: 'APP_HOST=localhost' });
+            const env = new Env(ENV_PATH, {
+                variables: {
+                    host: { rawName: 'APP_HOST', required: true }
+                }
+            }, fake);
+
+            env.get('host');
+            env.get('host');
+            t.assert.strictEqual(fake.readPaths.length, 2);
+        });
+
+        it('Read the file only once, and lazily, when "cacheable" is true', (t: it.TestContext) => {
+            const fake = new EnvFake({ [ENV_PATH]: 'APP_HOST=localhost\nAPP_PORT=8080' });
+            const env = new Env(ENV_PATH, {
+                cacheable: true,
+                variables: {
+                    host: { rawName: 'APP_HOST', required: true },
+                    port: { rawName: 'APP_PORT', required: true }
+                }
+            }, fake);
+
+            t.assert.strictEqual(fake.readPaths.length, 0);
+            t.assert.strictEqual(env.get('host'), 'localhost');
+            t.assert.strictEqual(env.get('port'), '8080');
+            t.assert.strictEqual(env.get('host'), 'localhost');
+            t.assert.strictEqual(fake.readPaths.length, 1);
+        });
+
+        it('Cache the absence of the file when "cacheable" is true', (t: it.TestContext) => {
+            const fake = new EnvFake({}, { APP_HOST: 'from-process' });
+            const env = new Env(ENV_PATH, {
+                cacheable: true,
+                variables: {
+                    host: { rawName: 'APP_HOST', required: true }
+                }
+            }, fake);
+
+            t.assert.strictEqual(env.get('host'), 'from-process');
+            t.assert.strictEqual(env.get('host'), 'from-process');
+            t.assert.strictEqual(fake.readPaths.length, 1);
+        });
+
+        it('Keep reading process.env live when "cacheable" is true', (t: it.TestContext) => {
+            const fake = new EnvFake({ [ENV_PATH]: 'APP_HOST=localhost' }, { APP_PORT: '3000' });
+            const env = new Env(ENV_PATH, {
+                cacheable: true,
+                variables: {
+                    port: { rawName: 'APP_PORT', required: true }
+                }
+            }, fake);
+
+            t.assert.strictEqual(env.get('port'), '3000');
+            fake.process.env.APP_PORT = '8080';
+            t.assert.strictEqual(env.get('port'), '8080');
+        });
+
+        it('Do not cache read errors other than ENOENT', (t: it.TestContext) => {
+            const error = Object.assign(
+                new Error(`EACCES: permission denied, open '${ENV_PATH}'`),
+                { code: 'EACCES' }
+            );
+
+            const fake = new EnvFake({ [ENV_PATH]: error });
+            const env = new Env(ENV_PATH, {
+                cacheable: true,
+                variables: {
+                    host: { rawName: 'APP_HOST' }
+                }
+            }, fake);
+
+            t.assert.throws(() => env.get('host'), error);
+            t.assert.throws(() => env.get('host'), error);
+            t.assert.strictEqual(fake.readPaths.length, 2);
         });
     });
 
@@ -244,7 +353,9 @@ describe('Env class', () => {
 
         it('Read from a real file when it exists', (t: it.TestContext) => {
             const env = new Env(path, {
-                value: { rawName: FILE_VAR, required: true }
+                variables: {
+                    value: { rawName: FILE_VAR, required: true }
+                }
             });
 
             t.assert.strictEqual(env.get('value'), 'from-file');
@@ -252,7 +363,9 @@ describe('Env class', () => {
 
         it('Read from the real process.env when the file does not exist', (t: it.TestContext) => {
             const env = new Env(join(dir, 'missing.env'), {
-                value: { rawName: FILE_VAR, required: true }
+                variables: {
+                    value: { rawName: FILE_VAR, required: true }
+                }
             });
 
             t.assert.strictEqual(env.get('value'), 'from-process');
@@ -260,10 +373,27 @@ describe('Env class', () => {
 
         it('Throw the real error when the path is not a readable file', (t: it.TestContext) => {
             const env = new Env(dir, {
-                value: { rawName: FILE_VAR, required: true }
+                variables: {
+                    value: { rawName: FILE_VAR, required: true }
+                }
             });
 
             t.assert.throws(() => env.get('value'), { code: 'EISDIR' });
+        });
+
+        it('Ignore later changes in a real file only when "cacheable" is true', async (t: it.TestContext) => {
+            const cachePath = join(dir, 'cache.env');
+            await writeFile(cachePath, `${FILE_VAR}=first`, 'utf-8');
+
+            const variables = { value: { rawName: FILE_VAR, required: true as const } };
+            const cached = new Env(cachePath, { cacheable: true, variables });
+            const live = new Env(cachePath, { variables });
+            t.assert.strictEqual(cached.get('value'), 'first');
+            t.assert.strictEqual(live.get('value'), 'first');
+
+            await writeFile(cachePath, `${FILE_VAR}=second`, 'utf-8');
+            t.assert.strictEqual(cached.get('value'), 'first');
+            t.assert.strictEqual(live.get('value'), 'second');
         });
     });
 });

@@ -1,0 +1,16 @@
+{
+  "name": "@bleed-believer/env",
+  "type": "module",
+  "scripts": {
+    "build:cls": "rm -rf ./dist",
+    "build:mts": "bleed build --config ./tsconfig.build.json",
+    "build:dts": "tsc --project ./tsconfig.build.json",
+    "build": "node --run build:cls && node --run build:mts && node --run build:dts",
+    "test": "node --import @bleed-believer/cli --test --"
+  },
+  "devDependencies": {
+    "@bleed-believer/cli": "^1.0.0",
+    "@types/node": "^26.0.0",
+    "typescript": "^7.0.0"
+  }
+}

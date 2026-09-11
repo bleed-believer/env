@@ -1,3 +1,5 @@
+import type { EnvVariables } from './interfaces/index.js';
+
 import { describe, it, before, after } from 'node:test';
 import { mkdtemp, writeFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
@@ -385,7 +387,7 @@ describe('Env class', () => {
             const cachePath = join(dir, 'cache.env');
             await writeFile(cachePath, `${FILE_VAR}=first`, 'utf-8');
 
-            const variables = { value: { rawName: FILE_VAR, required: true as const } };
+            const variables = { value: { rawName: FILE_VAR, required: true } } satisfies EnvVariables;
             const cached = new Env(cachePath, { cacheable: true, variables });
             const live = new Env(cachePath, { variables });
             t.assert.strictEqual(cached.get('value'), 'first');

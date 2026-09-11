@@ -1,3 +1,5 @@
+import type { EnvVariables } from './env.variable.js';
+
 export interface EnvOptions {
     /**
      * When `true`, the file is read and parsed only once (on the first `get`),
@@ -6,16 +8,5 @@ export interface EnvOptions {
      * @default false
      */
     cacheable?: boolean;
-    variables: {
-        [K: string]: { rawName: string; } & (
-            {
-                required?: false;
-                callback?: (v?: string) => unknown;
-            } |
-            {
-                required: true;
-                callback?: (v: string) => unknown;
-            }
-        );
-    };
+    variables: EnvVariables;
 }

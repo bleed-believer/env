@@ -1,4 +1,4 @@
-import type { EnvInject, EnvOptions } from './interfaces/index.js';
+import type { EnvInject, EnvOptions, EnvValue } from './interfaces/index.js';
 
 import { readFileSync } from 'node:fs';
 import { parseEnv } from 'node:util';
@@ -55,14 +55,7 @@ export class Env<O extends EnvOptions> {
         }
     }
 
-    get<K extends keyof O['variables']>(name: K): O['variables'][K]['callback'] extends (v: string) => unknown
-    ?   ReturnType<O['variables'][K]['callback']>
-    :   (
-        O['variables'][K]['required'] extends true
-        ?   string
-        :   string | undefined
-    );
-
+    get<K extends keyof O['variables']>(name: K): EnvValue<O['variables'][K]>;
     get(name: string): unknown {
         const descriptor = this.#options.variables[name];
         const rawValue = this.#getRawValue(descriptor.rawName);

@@ -1,18 +1,52 @@
 {
   "name": "@bleed-believer/env",
+  "version": "0.0.0",
+  "description": "Typed access to environment variables, with a .env file as a fallback for process.env.",
   "type": "module",
+  "license": "MIT",
+  "author": "sleep-written",
+  "homepage": "https://github.com/bleed-believer/env#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bleed-believer/env.git"
+  },
+  "bugs": {
+    "url": "https://github.com/bleed-believer/env/issues"
+  },
+  "keywords": [
+    "env",
+    "dotenv",
+    "environment",
+    "environment-variables",
+    "config",
+    "typescript",
+    "esm"
+  ],
+  "engines": {
+    "node": ">=20.12"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.js"
     }
   },
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build:cls": "rm -rf ./dist",
     "build:mts": "bleed build --config ./tsconfig.build.json",
-    "build:dts": "tsc --project ./tsconfig.build.json",
+    "build:dts": "node ./node_modules/typescript/bin/tsc --project ./tsconfig.build.json",
     "build": "node --run build:cls && node --run build:mts && node --run build:dts",
-    "test": "node --import @bleed-believer/cli --test --"
+    "test:dts": "node ./node_modules/typescript/bin/tsc --noEmit --project ./tsconfig.json",
+    "test:mts": "node --import @bleed-believer/cli --test --",
+    "test": "node --run test:dts && node --run test:mts",
+    "prepublishOnly": "node --run test && node --run build"
   },
   "devDependencies": {
     "@bleed-believer/cli": "^1.0.0",
